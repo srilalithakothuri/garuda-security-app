@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garuda - Insider Threat Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .toast {
+            transition: all 0.5s ease;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-900 text-gray-100 font-sans antialiased overflow-hidden selection:bg-indigo-500 selection:text-white">
+
+    <!-- Sidebar -->
+    <div class="flex h-screen">
+        <div class="w-64 bg-gray-800 border-r border-gray-700 flex flex-col transition-all duration-300">
+            <div class="p-6 border-b border-gray-700 flex items-center gap-3">
+                <i class="fas fa-shield-virus text-indigo-500 text-2xl"></i>
+                <span class="text-xl font-bold tracking-wider">GARUDA</span>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" onclick="showSection('dashboard')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-gray-700 text-white hover:bg-gray-600 transition"><i
+                        class="fas fa-chart-line w-5"></i> <span>Dashboard</span></a>
+                <a href="#" onclick="showSection('upload')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-file-upload w-5"></i> <span>File Analysis</span></a>
+                <a href="#" onclick="showSection('mdm')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-mobile-alt w-5"></i> <span>MDM Devices</span></a>
+                <a href="#" onclick="showSection('logs')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-list-alt w-5"></i> <span>System Logs</span></a>
+                <a href="#" onclick="showSection('response')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-user-shield w-5"></i> <span>Response Ops</span></a>
+                <a href="#" onclick="showSection('learn')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-graduation-cap w-5"></i> <span>Learning Center</span></a>
+                <a href="#" onclick="showSection('profile')"
+                    class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:bg-gray-700 hover:text-white transition"><i
+                        class="fas fa-id-card w-5"></i> <span>Profile & Settings</span></a>
+            </nav>
+            <div class="p-4 border-t border-gray-700">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                    <span class="text-xs text-gray-400">System Operational</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <div class="text-sm">
+                        <div class="font-bold text-white">{{ user.username }}</div>
+                        <div class="text-xs text-gray-500">{{ user.role }}</div>
+                    </div>
+                    <a href="/logout" class="text-red-400 hover:text-red-300"><i class="fas fa-sign-out-alt"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+            <header class="h-16 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-8">
+                <div class="text-sm text-gray-400">
+                    <span id="typewriter" class="font-mono text-indigo-400">Initializing subsystems...</span>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 uppercase">Threat Level</div>
+                        <div id="threat-badge" class="font-bold text-green-400">LOW</div>
+                    </div>
+                    <div class="h-8 w-px bg-gray-700"></div>
+                    <div class="text-center">
+                        <div class="text-xs text-gray-500 uppercase">Active Nodes</div>
+                        <div class="font-bold text-white">42</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-8 bg-gray-900 relative">
+
+                <!-- DASHBOARD -->
+                <div id="dashboard" class="page-section">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div
+                            class="glass-panel p-6 rounded-xl border border-indigo-500/20 shadow-lg shadow-indigo-500/10">
+                            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-2">Total Events Processed</h3>
+                            <div class="text-3xl font-bold text-white flex items-end gap-2">
+                                <span id="india-counter">2,401</span>
+                                <span class="text-xs text-green-400 mb-1"><i class="fas fa-arrow-up"></i> 12%</span>
+                            </div>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl border border-red-500/20 shadow-lg shadow-red-500/10">
+                            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-2">High Risk Anomalies</h3>
+                            <div class="text-3xl font-bold text-red-500" id="risk-counter">0</div>
+                        </div>
+                        <div
+                            class="glass-panel p-6 rounded-xl border border-amber-500/20 shadow-lg shadow-amber-500/10">
+                            <h3 class="text-gray-400 text-sm font-semibold uppercase mb-2">Global Threat Index</h3>
+                            <div class="text-3xl font-bold text-amber-500" id="global-counter">15,123</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Network Traffic
+                                Volume</h3>
+                            <canvas id="trafficChart" height="200"></canvas>
+                        </div>
+                        <div class="glass-panel p-6 rounded-xl">
+                            <h3 class="text-lg font-bold text-white mb-4 border-b border-gray-700 pb-2">Top Security
+                                Alerts</h3>
+                            <div id="alert-feed" class="space-y-3">
+                                <div class="text-gray-500 text-sm italic py-4 text-center">No active alerts... system
+                                    nominal.</div>
+                            </div>
+                            <button id="btn-export-pdf"
+                                class="mt-4 w-full py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition text-sm font-semibold">
+                                <i class="fas fa-file-pdf mr-2"></i> Export Incident Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FILE ANALYSIS -->
+                <div id="upload" class="page-section hidden">
+                    <div class="max-w-7xl mx-auto space-y-8">
+                        <div class="glass-panel p-10 rounded-xl text-center border-2 border-dashed border-gray-700 hover:border-indigo-500 transition cursor-pointer"
+                            id="drop-zone">
+                            <i class="fas fa-cloud-upload-alt text-6xl text-gray-600 mb-4"></i>
+                            <h2 class="text-2xl font-bold text-white mb-2">Upload Files or Logs</h2>
+                            <p class="text-gray-400 mb-6">Drag & Drop .csv Logs here for automated analysis.</p>
+                            <input type="file" id="fileInput" class="hidden">
+                            <button
+                                class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-semibold transition">Select
+                                File</button>
+                        </div>
+                        <div id="loading-indicator" class="hidden text-center text-indigo-400">
+                            <i class="fas fa-spinner fa-spin text-4xl mb-2"></i><br>Processing Data...
+                        </div>
+                        <div id="report-view" class="hidden space-y-8">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                                <div class="bg-white rounded-xl p-6 shadow-lg text-gray-800">
+                                    <h3 class="text-lg font-bold mb-4 text-gray-700">1. Activity by Hour</h3>
+                                    <div class="h-64 relative"><canvas id="activityChart"></canvas></div>
+                                </div>
+                                <div class="bg-white rounded-xl p-6 shadow-lg text-gray-800">
+                                    <h3 class="text-lg font-bold mb-4 text-gray-700">2. Data Transferred by User</h3>
+                                    <div class="h-64 relative"><canvas id="egressChart"></canvas></div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                                <div class="p-6 border-b border-gray-200 flex items-center gap-3">
+                                    <span class="text-2xl">🚨</span>
+                                    <h3 class="text-xl font-bold text-red-600">Prioritized Incident Log</h3>
+                                </div>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left border-collapse">
+                                        <thead
+                                            class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider font-semibold">
+                                            <tr>
+                                                <th class="px-6 py-3 border-b">Score</th>
+                                                <th class="px-6 py-3 border-b">Timestamp</th>
+                                                <th class="px-6 py-3 border-b">User</th>
+                                                <th class="px-6 py-3 border-b">Activity</th>
+                                                <th class="px-6 py-3 border-b">Anomalies</th>
+                                                <th class="px-6 py-3 border-b">Details</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="incident-body" class="text-sm text-gray-700"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MDM DEVICES -->
+                <div id="mdm" class="page-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white">Device Fleet Control</h2>
+                        <button onclick="enrollDevice()"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition hover:shadow-lg hover:shadow-indigo-500/20">
+                            <i class="fas fa-qrcode"></i> Enroll New Device
+                        </button>
+                    </div>
+                    <div id="enroll-modal"
+                        class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm transition-opacity">
+                        <div
+                            class="bg-gray-800 p-8 rounded-xl text-center border border-gray-700 shadow-2xl max-w-sm w-full relative transform transition-all scale-100">
+                            <button onclick="document.getElementById('enroll-modal').classList.add('hidden')"
+                                class="absolute top-4 right-4 text-gray-400 hover:text-white"><i
+                                    class="fas fa-times"></i></button>
+                            <h3 class="text-xl font-bold text-white mb-4">Scan to Enroll</h3>
+                            <div id="qr-display"
+                                class="bg-white p-4 rounded-lg mx-auto mb-4 w-48 h-48 flex items-center justify-center">
+                                <i class="fas fa-qrcode text-8xl text-black"></i>
+                            </div>
+                            <p id="enroll-link" class="text-xs text-indigo-400 break-all mb-4 font-mono">generating
+                                link...</p>
+                            <button onclick="simulateNewDevice()"
+                                class="w-full py-2 bg-gray-700 hover:bg-green-600 hover:text-white rounded text-sm mb-2 transition">Simulate
+                                "Device Handshake"</button>
+                            <div class="text-xs text-gray-500 animate-pulse">Waiting for connection...</div>
+                        </div>
+                    </div>
+                    <div id="device-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"></div>
+                </div>
+
+                <!-- SYSTEM LOGS -->
+                <div id="logs" class="page-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold text-white">System Audit Logs</h2>
+                        <button onclick="fetchLogs()" class="px-4 py-2 bg-gray-700 rounded hover:bg-gray-600"><i
+                                class="fas fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <table class="w-full text-left">
+                            <thead class="bg-gray-800 text-xs uppercase text-gray-400">
+                                <tr>
+                                    <th class="px-6 py-3">Timestamp</th>
+                                    <th class="px-6 py-3">User</th>
+                                    <th class="px-6 py-3">Action</th>
+                                    <th class="px-6 py-3">Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-body" class="divide-y divide-gray-700 text-sm"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- RESPONSE OPS -->
+                <div id="response" class="page-section hidden">
+                    <h2 class="text-2xl font-bold text-white mb-6">Active Countermeasures</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <button onclick="triggerAction('revoke')"
+                            class="group p-8 rounded-xl bg-gray-800 border border-gray-700 hover:border-red-500 hover:bg-red-500/10 transition text-center">
+                            <div
+                                class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-red-500 transition">
+                                <i class="fas fa-user-slash text-2xl text-red-500 group-hover:text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2">Revoke Access</h3>
+                        </button>
+                        <button onclick="triggerAction('encrypt')"
+                            class="group p-8 rounded-xl bg-gray-800 border border-gray-700 hover:border-amber-500 hover:bg-amber-500/10 transition text-center">
+                            <div
+                                class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-amber-500 transition">
+                                <i class="fas fa-file-contract text-2xl text-amber-500 group-hover:text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2">Encrypt Data</h3>
+                        </button>
+                        <button onclick="triggerAction('isolate')"
+                            class="group p-8 rounded-xl bg-gray-800 border border-gray-700 hover:border-indigo-500 hover:bg-indigo-500/10 transition text-center">
+                            <div
+                                class="w-16 h-16 bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:bg-indigo-500 transition">
+                                <i class="fas fa-network-wired text-2xl text-indigo-500 group-hover:text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white mb-2">Isolate Node</h3>
+                        </button>
+                    </div>
+
+                    <!-- SOC Alert Section -->
+                    <button onclick="triggerAction('soc_alert')"
+                        class="w-full mb-8 p-6 rounded-xl bg-red-900/20 border-2 border-dashed border-red-500/30 hover:border-red-500 hover:bg-red-900/30 transition flex items-center justify-center gap-6 group">
+                        <div
+                            class="p-4 bg-red-600 rounded-full shadow-lg shadow-red-600/50 group-hover:scale-110 transition animate-pulse">
+                            <i class="fas fa-broadcast-tower text-3xl text-white"></i>
+                        </div>
+                        <div class="text-left">
+                            <h3 class="text-2xl font-bold text-red-500 group-hover:text-red-400 transition">Broadcast
+                                SOC Alert</h3>
+                            <p class="text-gray-400 text-sm">Escalate threat level and notify Security Operations Center
+                                immediately.</p>
+                        </div>
+                    </button>
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-lg font-bold text-white mb-4">Command Console</h3>
+                        <div id="console-output"
+                            class="font-mono text-sm h-64 overflow-y-auto p-4 bg-black rounded text-green-400">> System
+                            Initialized.<br>> Waiting for executive command...</div>
+                    </div>
+                </div>
+
+                <!-- LEARNING CENTER -->
+                <div id="learn" class="page-section hidden">
+                    <h2 class="text-3xl font-bold text-white mb-2 text-center">Learn About Insider Threats</h2>
+                    <p class="text-gray-400 text-center mb-10 max-w-2xl mx-auto">Understand the psychology, indicators,
+                        and mechanics behind insider risks.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">Who is an Insider?</h3>
+                            <p class="text-gray-400 text-sm">Employees, contractors, or vendors. Harm can be accidental
+                                (negligence) or intentional (malicious).</p>
+                        </div>
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">What Makes a Threat?</h3>
+                            <p class="text-gray-400 text-sm">Motivations: financial gain, revenge, coercion. Risk
+                                increases where access is broad and oversight is weak.</p>
+                        </div>
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">Indicators</h3>
+                            <p class="text-gray-400 text-sm">Red flags: odd working hours, sudden large downloads,
+                                repeated login failures, or sudden behavioral changes.</p>
+                        </div>
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">Preventive Measures</h3>
+                            <p class="text-gray-400 text-sm">Least privilege, MFA, continuous monitoring, behavioral
+                                analytics, and audits.</p>
+                        </div>
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">Detection Heuristics</h3>
+                            <p class="text-gray-400 text-sm">This demo uses time anomalies (after-hours), login spikes,
+                                large egress events, and authorization violations.</p>
+                        </div>
+                        <div
+                            class="glass-panel p-8 rounded-2xl border border-indigo-500/20 hover:border-indigo-500 transition group">
+                            <h3 class="text-xl font-bold text-white mb-4">Case Snippet</h3>
+                            <p class="text-gray-400 text-sm">A finance user downloads salary files late at night and
+                                uploads them to personal cloud -> Alert Triggered.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFILE & SETTINGS -->
+                <div id="profile" class="page-section hidden">
+                    <div class="max-w-2xl mx-auto">
+                        <div class="glass-panel p-8 rounded-2xl mb-8">
+                            <div class="flex items-center gap-6 mb-8">
+                                <div
+                                    class="w-24 h-24 bg-indigo-600 rounded-full flex items-center justify-center text-3xl font-bold text-white border-4 border-gray-800 shadow-xl">
+                                    {{ user.username[0].upper() }}</div>
+                                <div>
+                                    <h2 class="text-2xl font-bold text-white">{{ user.username }}</h2>
+                                    <p class="text-gray-400 text-sm">Security Administrator • Garuda Systems Inc.</p>
+                                </div>
+                            </div>
+                            <div class="space-y-6">
+                                <div><label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Company
+                                        Name</label><input type="text" value="Garuda Systems Inc"
+                                        class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div><label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Role
+                                            Title</label><input type="text" value="Senior SecOps Analyst"
+                                            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-indigo-500 focus:outline-none transition">
+                                    </div>
+                                    <div><label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Contact
+                                            No.</label><input type="text" value="+1 (555) 012-3456"
+                                            class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-indigo-500 focus:outline-none transition">
+                                    </div>
+                                </div>
+                                <div><label class="block text-xs font-semibold text-gray-400 uppercase mb-2">Email
+                                        Address</label><input type="email" value="admin@garuda.sec"
+                                        class="w-full bg-gray-800 border border-gray-700 rounded-lg p-3 text-white focus:border-indigo-500 focus:outline-none transition">
+                                </div>
+                                <div class="pt-4 text-right"><button
+                                        onclick="toast('Profile Saved Successfully', 'success')"
+                                        class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-lg font-bold transition shadow-lg shadow-indigo-600/20">Save
+                                        Changes</button></div>
+                            </div>
+                        </div>
+                        <div class="text-center py-12 border-t border-gray-800">
+                            <h1 class="text-3xl font-bold text-indigo-500 mb-2 tracking-wider">GARUDA</h1>
+                            <p class="text-gray-500 text-sm mb-6">"Detecting the Threat Within — Insider Threat
+                                Detection from System Logs."</p>
+                            <div class="flex justify-center gap-6 mb-6">
+                                <a href="#" class="text-gray-600 hover:text-white transition text-xl"><i
+                                        class="fab fa-facebook"></i></a>
+                                <a href="#" class="text-gray-600 hover:text-white transition text-xl"><i
+                                        class="fab fa-twitter"></i></a>
+                                <a href="#" class="text-gray-600 hover:text-white transition text-xl"><i
+                                        class="fab fa-linkedin"></i></a>
+                            </div>
+                            <p class="text-xs text-gray-700">© 2025 GARUDA Systems. All rights reserved.</p>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <script>
+        function showSection(id) {
+            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(id);
+            if (target) target.classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('bg-gray-700', 'text-white');
+                el.classList.add('text-gray-400');
+            });
+            if (event && event.currentTarget) {
+                event.currentTarget.classList.remove('text-gray-400');
+                event.currentTarget.classList.add('bg-gray-700', 'text-white');
+            }
+            if (id === 'logs') fetchLogs();
+            if (id === 'mdm') fetchDevices();
+        }
+
+        function toast(msg, type = 'info') {
+            const colors = { info: 'bg-indigo-600', danger: 'bg-red-600', success: 'bg-green-600' };
+            const el = document.createElement('div');
+            el.className = `fixed right-6 bottom-6 ${colors[type]} text-white px-6 py-3 rounded-lg shadow-xl z-50 transform transition-all duration-500 translate-y-10 opacity-0`;
+            el.innerHTML = `<i class="fas fa-info-circle mr-2"></i> ${msg}`;
+            document.body.appendChild(el);
+            setTimeout(() => el.classList.remove('translate-y-10', 'opacity-0'), 100);
+            setTimeout(() => { el.classList.add('translate-y-10', 'opacity-0'); setTimeout(() => el.remove(), 500); }, 3000);
+        }
+
+        // Charts
+        const ctx = document.getElementById('trafficChart').getContext('2d');
+        const trafficChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: Array(10).fill(''), datasets: [{ label: 'Traffic (MB)', data: Array(10).fill(0).map(() => Math.random() * 100), borderColor: '#6366f1', backgroundColor: 'rgba(99, 102, 241, 0.1)', fill: true, tension: 0.4 }] },
+            options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#374151' } }, x: { grid: { display: false } } } }
+        });
+
+        setInterval(async () => {
+            try {
+                const res = await fetch('/api/stats');
+                const data = await res.json();
+                document.getElementById('threat-badge').innerText = data.threat_level;
+                document.getElementById('threat-badge').className = data.threat_level === 'HIGH' ? 'font-bold text-red-500 animate-pulse' : 'font-bold text-green-400';
+                const newData = trafficChart.data.datasets[0].data; newData.shift(); newData.push(data.network / 50); trafficChart.update();
+            } catch (e) { }
+        }, 2000);
+
+        setInterval(() => {
+            const el = document.getElementById('india-counter');
+            if (el) {
+                let val = parseInt(el.innerText.replace(/,/g, ''));
+                el.innerText = (val + Math.floor(Math.random() * 5)).toLocaleString();
+            }
+        }, 3000);
+
+        let pIndex = 0, pChar = 0, isDeleting = false;
+        const phrases = ["Watching for patterns...", "Data movements...", "Insider stress...", "Active sessions..."];
+        const typeEl = document.getElementById("typewriter");
+        function typeLoop() {
+            if (!typeEl) return;
+            const cur = phrases[pIndex]; typeEl.textContent = cur.substring(0, pChar);
+            if (!isDeleting && pChar < cur.length) { pChar++; setTimeout(typeLoop, 50); }
+            else if (isDeleting && pChar > 0) { pChar--; setTimeout(typeLoop, 30); }
+            else { isDeleting = !isDeleting; if (!isDeleting) pIndex = (pIndex + 1) % phrases.length; setTimeout(typeLoop, isDeleting ? 2000 : 500); }
+        }
+        typeLoop();
+
+        async function fetchLogs() {
+            try {
+                const res = await fetch('/api/logs');
+                const logs = await res.json();
+                document.getElementById('logs-body').innerHTML = logs.map(l => `<tr class="hover:bg-gray-800 transition"><td class="px-6 py-4 text-gray-400">${l.timestamp}</td><td class="px-6 py-4 font-semibold text-white">${l.username}</td><td class="px-6 py-4"><span class="px-2 py-1 bg-gray-700 rounded text-xs">${l.action}</span></td><td class="px-6 py-4 text-gray-400">${l.details}</td></tr>`).join('');
+                const alerts = logs.filter(l => l.action.includes('ALERT') || l.action.includes('ANOMALY')).slice(0, 5);
+                if (alerts.length > 0) {
+                    document.getElementById('risk-counter').innerText = alerts.length;
+                    document.getElementById('alert-feed').innerHTML = alerts.map(l => `<div class="p-3 bg-red-900/20 border-l-4 border-red-500 rounded flex justify-between items-center"><div><div class="font-bold text-red-400 text-sm">${l.action}</div><div class="text-xs text-gray-400">${l.details}</div></div><div class="text-xs text-gray-500">${l.timestamp.split(' ')[1]}</div></div>`).join('');
+                }
+            } catch (e) { }
+        }
+
+        async function fetchDevices() {
+            try {
+                const res = await fetch('/api/devices');
+                const devices = await res.json();
+                document.getElementById('device-grid').innerHTML = devices.map(d => {
+                    const isLocked = d.is_locked || d.status === 'Locked';
+                    const isEncrypted = d.is_encrypted;
+                    const isIso = d.is_isolated || d.status === 'Isolated';
+                    const risk = d.risk_score || 0;
+                    return `
+                    <div class="glass-panel p-5 rounded-xl border border-gray-700 hover:border-indigo-500 transition group relative">
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 ${d.device_type === 'Mobile' ? 'bg-indigo-900/50 text-indigo-400' : 'bg-purple-900/50 text-purple-400'} rounded-lg flex items-center justify-center"><i class="fas fa-${d.device_type === 'Mobile' ? 'mobile-alt' : 'laptop'}"></i></div>
+                                <div><div class="font-bold text-white">${d.device_name}</div><div class="text-xs text-gray-400">ID: DEV-${d.id} • ${d.last_seen ? d.last_seen.split(' ')[1] : ''}</div></div>
+                            </div>
+                            <div class="flex gap-1">
+                                ${isLocked ? '<span class="text-red-500" title="Locked"><i class="fas fa-lock"></i></span>' : ''}
+                                ${isEncrypted ? '<span class="text-green-400" title="Encrypted"><i class="fas fa-shield-alt"></i></span>' : ''}
+                                ${isIso ? '<span class="text-amber-500" title="Isolated"><i class="fas fa-network-wired"></i></span>' : ''}
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-xs mb-1"><span class="text-gray-400">Security Status</span><span class="${d.status.toLowerCase().includes('secure') ? 'text-green-400' : 'text-red-400'} font-bold">${d.status}</span></div>
+                            <div class="w-full bg-gray-700 h-1 rounded-full overflow-hidden"><div class="bg-${risk > 50 ? 'red' : 'green'}-500 h-full" style="width: ${risk}%"></div></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="controlDevice(${d.id}, 'lock')" class="p-2 bg-gray-800 hover:bg-black border border-gray-600 rounded text-xs text-gray-300 transition" title="Lock Device"><i class="fas fa-lock"></i> Lock</button>
+                            <button onclick="controlDevice(${d.id}, 'wipe')" class="p-2 bg-gray-800 hover:bg-red-900/50 border border-gray-600 hover:border-red-500 rounded text-xs text-gray-300 transition" title="Wipe Data"><i class="fas fa-trash"></i> Wipe</button>
+                            <button onclick="controlDevice(${d.id}, 'encrypt')" class="p-2 bg-gray-800 hover:bg-green-900/50 border border-gray-600 hover:border-green-500 rounded text-xs text-gray-300 transition" title="Enforce Encryption"><i class="fas fa-file-code"></i> Encrypt</button>
+                            <button onclick="controlDevice(${d.id}, 'isolate')" class="p-2 bg-gray-800 hover:bg-amber-900/50 border border-gray-600 hover:border-amber-500 rounded text-xs text-gray-300 transition" title="Isolate Network"><i class="fas fa-ban"></i> Isolate</button>
+                            <button onclick="controlDevice(${d.id}, 'scan')" class="p-2 bg-gray-800 hover:bg-indigo-900/50 border border-gray-600 hover:border-indigo-500 rounded text-xs text-gray-300 transition" title="Threat Scan"><i class="fas fa-virus"></i> Scan</button>
+                            <button onclick="controlDevice(${d.id}, 'revoke')" class="p-2 bg-gray-800 hover:bg-red-900/50 border border-gray-600 hover:border-red-500 rounded text-xs text-red-400 transition" title="Revoke User"><i class="fas fa-user-times"></i> Revoke</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (e) { }
+        }
+
+        async function enrollDevice() {
+            document.getElementById('enroll-modal').classList.remove('hidden');
+            const res = await fetch('/api/mdm/enroll', { method: 'POST' });
+            const data = await res.json();
+            if (data.success) { document.getElementById('enroll-link').innerText = data.enrollment_link; }
+        }
+
+        async function simulateNewDevice() {
+            const types = ['Mobile', 'Laptop', 'Tablet', 'Desktop'];
+            const names = ['Executive iPad Pro', 'Dev Team MacBook', 'Finance Workstation', 'Field Galaxy S24', 'HR Surface Laptop', 'CEO iPhone 15', 'Server Admin Console', 'Guest Lobby PC', 'Warehouse Scanner', 'Reception iMac'];
+            const rName = names[Math.floor(Math.random() * names.length)];
+            const rType = types[Math.floor(Math.random() * types.length)];
+            await fetch('/api/mdm/new_device_simulate', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: rName, type: rType })
+            });
+            document.getElementById('enroll-modal').classList.add('hidden');
+            toast(`Connected: ${rName}`, 'success');
+            fetchDevices();
+        }
+
+        async function controlDevice(id, cmd) {
+            toast(`Executing: ${cmd.toUpperCase()}...`, 'info');
+            try {
+                const res = await fetch('/api/mdm/command', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_id: id, command: cmd })
+                });
+                const data = await res.json();
+                if (data.success) { toast(data.message, 'success'); fetchDevices(); }
+                else { toast('Command Failed', 'danger'); }
+            } catch (e) { toast('Connection Error', 'danger'); }
+        }
+
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('fileInput');
+        let chart1 = null, chart2 = null;
+
+        if (dropZone) {
+            dropZone.addEventListener('click', () => fileInput.click());
+            dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-indigo-500'); });
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-indigo-500'));
+            dropZone.addEventListener('drop', (e) => { e.preventDefault(); dropZone.classList.remove('border-indigo-500'); handleFiles(e.dataTransfer.files); });
+            fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
+        }
+
+        async function handleFiles(files) {
+            if (!files.length) return;
+            document.getElementById('loading-indicator').classList.remove('hidden');
+            document.getElementById('report-view').classList.add('hidden');
+            const formData = new FormData(); formData.append('file', files[0]);
+            try {
+                const res = await fetch('/api/upload', { method: 'POST', body: formData });
+                const data = await res.json();
+                document.getElementById('loading-indicator').classList.add('hidden');
+                if (data.graph_data) {
+                    document.getElementById('report-view').classList.remove('hidden');
+                    renderCharts(data.graph_data);
+                    renderTable(data.graph_data.incidents);
+                    toast('Threat Analysis Complete', 'success');
+                } else { toast(data.scan_result, data.scan_result === 'CLEAN' ? 'success' : 'danger'); }
+            } catch (e) { document.getElementById('loading-indicator').classList.add('hidden'); toast('Analysis Failed', 'danger'); }
+        }
+
+        function renderCharts(data) {
+            const ctx1 = document.getElementById('activityChart').getContext('2d');
+            if (chart1) chart1.destroy();
+            chart1 = new Chart(ctx1, { type: 'bar', data: { labels: Array.from({ length: 24 }, (_, i) => `${i}h`), datasets: [{ label: 'Activity', data: data.activity_by_hour, backgroundColor: data.activity_by_hour.map((v, i) => i === 10 ? '#6366f1' : '#a5f3fc'), borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } } });
+            const ctx2 = document.getElementById('egressChart').getContext('2d');
+            if (chart2) chart2.destroy();
+            chart2 = new Chart(ctx2, { type: 'bar', data: { labels: Object.keys(data.data_by_user), datasets: [{ label: 'MB Transferred', data: Object.values(data.data_by_user), backgroundColor: Object.values(data.data_by_user).map(v => v > 1000 ? '#f43f5e' : '#67e8f9'), borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } } } });
+        }
+
+        function renderTable(incidents) {
+            const tbody = document.getElementById('incident-body');
+            if (!incidents || !incidents.length) { tbody.innerHTML = '<tr><td colspan="6" class="p-6 text-center text-gray-500">No anomalies detected.</td></tr>'; return; }
+            tbody.innerHTML = incidents.map(inc => `<tr class="bg-yellow-50 border-b border-yellow-100 hover:bg-yellow-100 transition"><td class="px-6 py-4 font-bold text-gray-700">${inc.score}</td><td class="px-6 py-4 text-gray-600">${inc.timestamp}</td><td class="px-6 py-4 font-mono text-gray-800">${inc.user_id}</td><td class="px-6 py-4 text-gray-700 font-semibold">${inc.activity}</td><td class="px-6 py-4 text-red-600 font-medium">${inc.anomalies}</td><td class="px-6 py-4 text-gray-500 italic">${inc.details || '-'}</td></tr>`).join('');
+        }
+
+        async function triggerAction(action) {
+            const consoleDiv = document.getElementById('console-output');
+            consoleDiv.innerHTML += `<br>> COMMAND RECEIVED: ${action.toUpperCase()}_PROTOCOL`; consoleDiv.scrollTop = consoleDiv.scrollHeight;
+            try {
+                const res = await fetch(`/api/security/${action}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'demo' }) });
+                const data = await res.json();
+                setTimeout(() => { consoleDiv.innerHTML += `<br>> [SUCCESS] ${data.message}`; consoleDiv.scrollTop = consoleDiv.scrollHeight; toast(`Action Complete: ${action.toUpperCase()}`, 'success'); }, 800);
+            } catch (e) { toast('Command Failed', 'danger'); }
+        }
+
+        document.getElementById('btn-export-pdf').addEventListener('click', async () => {
+            const { jsPDF } = window.jspdf; const doc = new jsPDF();
+            doc.setFillColor(31, 41, 55); doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.text("GARUDA - Incident Report", 14, 25);
+            doc.setTextColor(50, 50, 50); doc.setFontSize(10); doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 50);
+            const res = await fetch('/api/logs'); const logs = await res.json();
+            const alerts = logs.filter(l => l.action.includes('ALERT') || l.action.includes('ANOMALY'));
+            doc.setFontSize(14); doc.setTextColor(220, 38, 38); doc.text(`Critical Threats: ${alerts.length}`, 14, 70);
+            let y = 85; doc.setFontSize(10); doc.setTextColor(0, 0, 0);
+            alerts.forEach((alert, i) => { if (y > 270) { doc.addPage(); y = 20; } doc.setFont(undefined, 'bold'); doc.text(`${i + 1}. [${alert.timestamp}] ${alert.action}`, 14, y); doc.setFont(undefined, 'normal'); doc.text(`Details: ${alert.details}`, 20, y + 5); y += 15; });
+            doc.save('garuda_security_report.pdf'); toast('PDF Report Generated', 'success');
+        });
+    </script>
+</body>
+
+</html>

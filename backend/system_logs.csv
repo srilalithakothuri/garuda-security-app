@@ -1,0 +1,101 @@
+Timestamp,User_ID,Activity,Details,Status,Bytes_Transferred
+2025-10-31 00:03:56,U013,File_Edit,Modified /projects/budget.xlsx,Success,8025
+2025-10-31 06:28:09,U020,File_Edit,Modified /projects/budget.xlsx,Success,7398
+2025-10-31 04:44:57,U009,File_Access,Accessed /projects/design_doc.pdf,Success,23597
+2025-10-31 23:03:08,U017,Login,User logged in from office network,Success,0
+2025-10-30 11:13:05,U009,Email_Send,Sent project update to manager,Success,6618
+2025-10-31 15:30:06,U020,Login,Login from unfamiliar IP 192.168.55.23,Suspicious,0
+2025-10-31 20:38:04,U010,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,50092
+2025-10-31 22:42:50,U006,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,52249
+2025-10-30 12:07:58,U009,Email_Send,Sent project update to manager,Success,8868
+2025-10-30 10:18:17,U017,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,45144
+2025-10-30 10:47:05,U017,Logout,User logged out,Success,0
+2025-10-30 17:31:32,U004,Login,User logged in from office network,Success,0
+2025-10-31 10:44:43,U017,Logout,User logged out,Success,0
+2025-10-30 14:41:40,U014,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,53931
+2025-10-31 04:00:15,U014,File_Access,Accessed /projects/design_doc.pdf,Success,21741
+2025-10-30 11:23:26,U015,Email_Send,Sent project update to manager,Success,11124
+2025-10-31 00:36:52,U008,Process_Execution,"Executed disguised file ""report.pdf.exe""",Suspicious,0
+2025-10-31 12:55:44,U012,Email_Send,Sent project update to manager,Success,9884
+2025-10-30 20:52:28,U013,Email_Send,Sent project update to manager,Success,8880
+2025-10-31 17:41:43,U008,Process_Execution,"Executed disguised file ""report.pdf.exe""",Suspicious,0
+2025-10-31 05:47:57,U020,Login,User logged in from office network,Success,0
+2025-10-30 13:52:19,U007,Email_Send,Sent project update to manager,Success,9748
+2025-10-31 12:14:43,U004,File_Access,Accessed /projects/design_doc.pdf,Success,25624
+2025-10-30 14:06:16,U008,File_Access,Accessed /projects/design_doc.pdf,Success,26704
+2025-10-31 01:42:14,U010,File_Access,Accessed /projects/design_doc.pdf,Success,22307
+2025-10-30 23:58:28,U015,Logout,User logged out,Success,0
+2025-10-30 21:14:49,U011,Logout,User logged out,Success,0
+2025-10-30 19:08:45,U004,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,50944
+2025-10-31 02:33:00,U003,Logout,User logged out,Success,0
+2025-10-30 17:14:50,U018,USB_Insert,Removable device connected (SanDisk_64GB),Suspicious,0
+2025-10-31 19:37:11,U012,File_Access,Accessed /projects/design_doc.pdf,Success,22318
+2025-10-31 22:45:35,U018,File_Edit,Modified /projects/budget.xlsx,Success,8683
+2025-10-31 17:19:20,U014,File_Access,Accessed /projects/design_doc.pdf,Success,28313
+2025-10-30 21:51:38,U015,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,49297
+2025-10-31 01:22:52,U011,File_Access,Accessed /projects/design_doc.pdf,Success,23699
+2025-10-31 02:26:26,U016,Email_Send,Sent project update to manager,Success,8904
+2025-10-31 20:32:29,U008,Logout,User logged out,Success,0
+2025-10-31 15:47:43,U019,File_Edit,Modified /projects/budget.xlsx,Success,8017
+2025-10-30 21:57:56,U006,File_Edit,Modified /projects/budget.xlsx,Success,14770
+2025-10-31 14:18:06,U002,Login,User logged in from office network,Success,0
+2025-10-30 19:07:36,U001,File_Copy,Copied /confidential/data to external drive,Suspicious,1999052
+2025-10-31 09:59:46,U018,Login,User logged in from office network,Success,0
+2025-10-31 17:31:10,U017,Email_Send,Sent project update to manager,Success,11690
+2025-10-31 01:49:36,U003,File_Access,Accessed /projects/design_doc.pdf,Success,25857
+2025-10-31 11:15:47,U015,Email_Send,Sent project update to manager,Success,4103
+2025-10-30 15:59:13,U008,Email_Send,Sent project update to manager,Success,3271
+2025-10-31 18:28:32,U006,File_Access,Accessed /projects/design_doc.pdf,Success,28855
+2025-10-30 12:39:12,U003,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,53273
+2025-10-31 01:24:54,U017,Logout,User logged out,Success,0
+2025-10-31 07:32:09,U014,Logout,User logged out,Success,0
+2025-10-31 18:54:15,U015,File_Access,Accessed /projects/design_doc.pdf,Success,27644
+2025-10-31 16:20:47,U012,Process_Execution,"Executed disguised file ""report.pdf.exe""",Suspicious,0
+2025-10-31 14:27:21,U003,File_Access,Accessed /projects/design_doc.pdf,Success,27250
+2025-10-30 13:37:33,U002,File_Access,Accessed /projects/design_doc.pdf,Success,21193
+2025-10-30 19:56:41,U002,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,50722
+2025-10-30 16:23:42,U001,File_Edit,Modified /projects/budget.xlsx,Success,10902
+2025-10-30 08:37:30,U016,Logout,User logged out,Success,0
+2025-10-31 19:57:17,U003,Email_Send,Sent project update to manager,Success,9786
+2025-10-31 07:51:51,U011,Email_Send,Sent project update to manager,Success,5328
+2025-10-30 16:12:32,U012,File_Copy,Copied /confidential/data to external drive,Suspicious,2002551
+2025-10-30 10:02:33,U014,File_Access,Accessed /projects/design_doc.pdf,Success,21312
+2025-10-31 22:56:47,U005,Email_Send,Sent project update to manager,Success,9352
+2025-10-30 19:34:39,U007,Email_Send,Sent project update to manager,Success,7695
+2025-10-30 16:10:52,U002,Email_Send,Sent project update to manager,Success,12069
+2025-10-30 12:04:52,U014,Logout,User logged out,Success,0
+2025-10-30 11:04:38,U015,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,47898
+2025-10-30 21:03:09,U003,Logout,User logged out,Success,0
+2025-10-31 02:20:14,U014,File_Access,Accessed /projects/design_doc.pdf,Success,27333
+2025-10-31 17:15:18,U002,Logout,User logged out,Success,0
+2025-10-31 17:57:36,U012,Logout,User logged out,Success,0
+2025-10-30 10:19:41,U018,Logout,User logged out,Success,0
+2025-10-31 01:06:21,U010,File_Edit,Modified /projects/budget.xlsx,Success,9748
+2025-10-31 09:58:22,U004,Email_Send,Sent project update to manager,Success,8100
+2025-10-30 15:55:02,U001,Login,User logged in from office network,Success,0
+2025-10-30 10:37:58,U001,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,47492
+2025-10-30 17:36:27,U011,File_Edit,Modified /projects/budget.xlsx,Success,12273
+2025-10-31 17:47:06,U005,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,45601
+2025-10-31 05:31:42,U017,Logout,User logged out,Success,0
+2025-10-31 19:53:25,U019,File_Edit,Modified /projects/budget.xlsx,Success,5908
+2025-10-30 22:53:19,U002,Logout,User logged out,Success,0
+2025-10-31 18:48:27,U007,File_Access,Accessed /projects/design_doc.pdf,Success,28767
+2025-10-31 13:29:52,U008,Email_Send,Sent project update to manager,Success,6270
+2025-10-31 11:00:42,U017,File_Delete,Deleted system history logs,Suspicious,0
+2025-10-31 19:26:37,U016,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,54790
+2025-10-31 02:38:56,U019,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,48492
+2025-10-30 22:11:30,U009,Logout,User logged out,Success,0
+2025-10-30 09:18:50,U016,File_Edit,Modified /projects/budget.xlsx,Success,8332
+2025-10-31 02:45:37,U002,File_Edit,Modified /projects/budget.xlsx,Success,11772
+2025-10-31 19:08:30,U018,File_Access,Accessed /projects/design_doc.pdf,Success,26506
+2025-10-30 14:01:39,U003,Email_Send,Sent project update to manager,Success,12924
+2025-10-30 11:55:21,U016,File_Access,Accessed /projects/design_doc.pdf,Success,29100
+2025-10-30 17:36:51,U006,Email_Send,Sent project update to manager,Success,10853
+2025-10-31 17:35:25,U007,Email_Send,Sent project update to manager,Success,7838
+2025-10-30 23:17:56,U004,Email_Send,Sent project update to manager,Success,4403
+2025-10-31 20:31:51,U013,File_Edit,Modified /projects/budget.xlsx,Success,10182
+2025-10-31 13:47:16,U001,File_Edit,Modified /projects/budget.xlsx,Success,14065
+2025-10-31 15:54:29,U005,File_Access,Accessed /projects/design_doc.pdf,Success,23045
+2025-10-31 22:32:52,U002,Email_Attachment,Downloaded attachment 'client_data.xlsx',Success,53871
+2025-10-31 04:38:43,U013,File_Edit,Modified /projects/budget.xlsx,Success,11986
+2025-10-30 14:29:54,U006,File_Access,Accessed /projects/design_doc.pdf,Success,27423
