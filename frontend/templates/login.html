@@ -60,10 +60,9 @@
             border-radius: 20px;
             box-shadow: 0 0 40px rgba(0, 242, 255, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             text-align: center;
             position: relative;
-            overflow: hidden;
         }
 
         .login-card::before {
@@ -176,16 +175,27 @@
 
         <!-- Register Form -->
         <form id="registerForm" style="display:none;">
-            <div class="input-group">
-                <input type="text" id="reg-username" placeholder="New Username" required>
-            </div>
-            <div class="input-group">
-                <input type="email" id="reg-email" placeholder="Corporate Email" required>
-            </div>
-            <div class="input-group">
-                <input type="password" id="reg-password" placeholder="Set Password" required>
-                <i class="fas fa-eye password-toggle" onclick="togglePassword('reg-password', this)"
-                    title="Show Password"></i>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="text" id="reg-company" placeholder="Company Name" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="text" id="reg-role" placeholder="Role (e.g. Analyst)" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="text" id="reg-phone" placeholder="Phone Number" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <input type="text" id="reg-username" placeholder="New Username" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0; grid-column: span 2;">
+                    <input type="email" id="reg-email" placeholder="Corporate Email" required>
+                </div>
+                <div class="input-group" style="margin-bottom: 0; grid-column: span 2;">
+                    <input type="password" id="reg-password" placeholder="Set Password" required>
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('reg-password', this)"
+                        title="Show Password"></i>
+                </div>
             </div>
             <button type="submit">Send Verification</button>
             <div style="margin-top:1rem; font-size:0.9rem; color:#aaa;">
@@ -300,6 +310,9 @@
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = registerForm.querySelector('button');
+            const comp = document.getElementById('reg-company').value;
+            const role = document.getElementById('reg-role').value;
+            const phone = document.getElementById('reg-phone').value;
             const u = document.getElementById('reg-username').value;
             const em = document.getElementById('reg-email').value;
             const p = document.getElementById('reg-password').value;
@@ -311,7 +324,14 @@
                 const res = await fetch('/api/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: u, email: em, password: p })
+                    body: JSON.stringify({ 
+                        company_name: comp,
+                        role: role,
+                        phone_number: phone,
+                        username: u, 
+                        email: em, 
+                        password: p 
+                    })
                 });
 
                 let data;

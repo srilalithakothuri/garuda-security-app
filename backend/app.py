@@ -39,6 +39,14 @@ def close_connection(exception):
 def init_db():
     with app.app_context():
         db = get_db()
+        # Add new columns gracefully
+        try:
+            db.execute("ALTER TABLE users ADD COLUMN company_name TEXT")
+            db.execute("ALTER TABLE users ADD COLUMN phone_number TEXT")
+            db.execute("ALTER TABLE users ADD COLUMN email TEXT")
+        except sqlite3.OperationalError:
+            pass
+
         # Users table
         db.execute('''CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -46,7 +54,10 @@ def init_db():
             password TEXT NOT NULL,
             role TEXT DEFAULT 'user',
             access_revoked BOOLEAN DEFAULT 0,
-            is_isolated BOOLEAN DEFAULT 0
+            is_isolated BOOLEAN DEFAULT 0,
+            company_name TEXT,
+            phone_number TEXT,
+            email TEXT
         )''')
         # Logs table
         db.execute('''CREATE TABLE IF NOT EXISTS logs (
@@ -200,11 +211,21 @@ def register():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    company_name = data.get('company_name')
+    role = data.get('role', 'user')
+    phone_number = data.get('phone_number')
     db = get_db()
     if db.execute('SELECT id FROM users WHERE username = ?', (username,)).fetchone():
         return jsonify({'error': 'Username exists'}), 400
     code = ''.join(random.choices(string.digits, k=6))
-    verification_codes[email] = {'code': code, 'data': {'username': username, 'password': generate_password_hash(password), 'role': 'user'}}
+    verification_codes[email] = {'code': code, 'data': {
+        'username': username, 
+        'password': generate_password_hash(password), 
+        'role': role,
+        'company_name': company_name,
+        'phone_number': phone_number,
+        'email': email
+    }}
     print(f"\n[SIMULATED EMAIL] Code: {code}\n")
     return jsonify({'success': True, 'simulation_code': code})
 
@@ -217,8 +238,8 @@ def verify():
         return jsonify({'error': 'Invalid code'}), 400
     user_data = verification_codes[email]['data']
     db = get_db()
-    db.execute('INSERT INTO users (username, password, role) VALUES (?, ?, ?)', 
-               (user_data['username'], user_data['password'], user_data['role']))
+    db.execute('INSERT INTO users (username, password, role, company_name, phone_number, email) VALUES (?, ?, ?, ?, ?, ?)', 
+               (user_data['username'], user_data['password'], user_data['role'], user_data.get('company_name'), user_data.get('phone_number'), user_data.get('email')))
     db.commit()
     del verification_codes[email]
     return jsonify({'success': True})
